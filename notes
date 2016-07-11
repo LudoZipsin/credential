@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE tudu SYSTEM "/usr/share/tudu/tudu.dtd">
+<todo>
+	<todo done="no" collapse="no">
+		<title>requirements</title>
+		<text>
+</text>
+		<todo done="no" collapse="no">
+			<title>pip</title>
+			<text>
+</text>
+			<todo done="no" collapse="no">
+				<title>pysqlcipher</title>
+				<text>for crypted sqlite. Interface to sqlcipher for python 3.
+</text>
+			</todo>
+			<todo done="no" collapse="no">
+				<title>peewee</title>
+				<text>orm for sqlite and sqlcipher for python
+
+</text>
+			</todo>
+		</todo>
+		<todo done="no" collapse="no">
+			<title>apt</title>
+			<text>
+</text>
+			<todo done="no" collapse="no">
+				<title>sqlcipher</title>
+				<text>crypted sqlite
+</text>
+			</todo>
+		</todo>
+	</todo>
+</todo>
