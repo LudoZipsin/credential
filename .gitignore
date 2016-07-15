@@ -1,14 +1,15 @@
 # virtualenv
 
-bin/*
-include/*
-lib/*
-pip-selfcheck.json
-share/*
+virtualenv/*
+virtualenv/bin/*
+virtualenv/include/*
+virtualenv/lib/*
+virtualenv/pip-selfcheck.json
+virtualenv/share/*
 
 # test persos
 
-src/test-perso/*
+test-perso/*
 
 # IDE
 
