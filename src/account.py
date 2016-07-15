@@ -36,6 +36,7 @@ class Account(Model):
     service = TextField()
     account = TextField()
     passphrase = TextField()
+    alias = TextField()
 
     class Meta:
         database = db

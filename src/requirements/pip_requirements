@@ -2,3 +2,4 @@ pysqlcipher
 peewee
 pyaml
 pyperclip
+PrettyTable
