@@ -59,22 +59,32 @@ def _list_account_printer(dictionary, field_list):
 
 
 def get_handler(sub_args):
-    pass
+    credential = Account.select().where(Account.alias == sub_args.alias)
+    get = credential.account if sub_args.selection == "account" else credential.passphrase
+    if sub_args.prompt:
+        print get
+    else:
+        import pyperclip
+        pyperclip.copy(get)
 
 
 def add_handler(sub_args):
-    pass
-
-
-def edit_handler(sub_args):
+    # TODO
     pass
 
 
 def remove_handler(sub_args):
+    # TODO
+    pass
+
+
+def edit_handler(sub_args):
+    # TODO
     pass
 
 
 def account_passphrase_validity(passphrase):
+    # TODO
     pass
 
 
@@ -94,7 +104,17 @@ if __name__ == "__main__":
 
     # get sub command parser
     parser_get = subparsers.add_parser("get", help="Get a stored credential")
-    # parser_get.add_argument()
+    parser_get.add_argument("alias",
+                            help="the alias of the account you want to gain credential of")
+    parser_get.add_argument("-s", "--selection",
+                            help="select which part of the credential you want. Account or passphrase",
+                            choices=["account", "passphrase"],
+                            default="account",
+                            nargs=1)
+    parser_get.add_argument("-p", "--prompt",
+                            help="Do not store the credential in the clipboard but pormpt it",
+                            action="store_true",
+                            default=False)
     parser_get.set_default(func=get_handler)
 
     # add sub command parser
