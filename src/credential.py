@@ -60,7 +60,9 @@ def _list_account_printer(dictionary, field_list):
 
 def get_handler(sub_args):
     credential = Account.select().where(Account.alias == sub_args.alias)
-    get = credential.account if sub_args.selection == "account" else credential.passphrase
+    get = credential.account if sub_args.selection == "account" \
+        else credential.passphrase if sub_args.selection == "passphrase" \
+        else credential.service
     if sub_args.prompt:
         print get
     else:
@@ -83,9 +85,9 @@ def edit_handler(sub_args):
     pass
 
 
-def account_passphrase_validity(passphrase):
-    # TODO
-    pass
+def _alias_validity(alias):
+    select = Account.select().where(Account.alias == alias)
+    return True if len(select) == 0 else False
 
 
 if __name__ == "__main__":
@@ -107,9 +109,9 @@ if __name__ == "__main__":
     parser_get.add_argument("alias",
                             help="the alias of the account you want to gain credential of")
     parser_get.add_argument("-s", "--selection",
-                            help="select which part of the credential you want. Account or passphrase",
-                            choices=["account", "passphrase"],
-                            default="account",
+                            help="select which part of the credential you want. Account, passphrase or service",
+                            choices=["account", "passphrase", "service"],
+                            default="service",
                             nargs=1)
     parser_get.add_argument("-p", "--prompt",
                             help="Do not store the credential in the clipboard but pormpt it",
@@ -119,7 +121,12 @@ if __name__ == "__main__":
 
     # add sub command parser
     parser_add = subparsers.add_parser("add", help="Add a credential")
-    # parser_add.add_argument()
+    parser_add.add_argument("-s", "--service",
+                            help="")
+    parser_add.add_argument("-a", "--account",
+                            help="")
+    parser_add.add_argument("-A", "--alias",
+                            help="")
     parser_add.set_default(func=add_handler)
 
     # remove sub command parser

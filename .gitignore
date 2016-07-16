@@ -10,6 +10,7 @@ virtualenv/share/*
 # test persos
 
 test-perso/*
+src/main.py
 
 # IDE
 

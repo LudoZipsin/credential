@@ -1,0 +1,19 @@
+## Acces the crypt and decrypt password
+
+The password used to crypt and decrypt the sqlite database (sqlciher) will be stored in:
+
+/etc/credential/crypt.conf
+
+This file will be a yaml file with the following permission:
+
+chmod 700 /etc/credential/crypt.conf
+
+This file will be owned by the sudo user. That way, nobody without the sudo password will be able to read its content.
+
+## How to use it
+
+### Command line
+
+To use the script in command line, one must be sudo (in order to access the password). (No need to ask for the password, if not launched with sudo, then the script will launch a "missing privilege. Must be rrot").
+
+
