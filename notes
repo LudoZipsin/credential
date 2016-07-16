@@ -9,33 +9,33 @@
 			<title>pip</title>
 			<text>
 </text>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>pysqlcipher</title>
 				<text>for crypted sqlite. Interface to sqlcipher for python 3.
 </text>
 			</todo>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>peewee</title>
 				<text>orm for sqlite and sqlcipher for python
 
 </text>
 			</todo>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>pyperclip</title>
 				<text>
 </text>
 			</todo>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>prettytable</title>
 				<text>
 </text>
 			</todo>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>pyaml</title>
 				<text>
 </text>
 			</todo>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>click</title>
 				<text>
 </text>
@@ -45,12 +45,12 @@
 			<title>apt</title>
 			<text>
 </text>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>sqlcipher</title>
 				<text>crypted sqlite
 </text>
 			</todo>
-			<todo done="no" collapse="no">
+			<todo done="yes" collapse="no">
 				<title>xclip</title>
 				<text>
 </text>
@@ -71,21 +71,19 @@
 			<text>
 </text>
 		</todo>
-		<todo done="no" collapse="yes">
+		<todo done="yes" collapse="yes">
 			<title>add</title>
-			<category>in progress</category>
 			<text>
 </text>
 		</todo>
-		<todo done="no" collapse="no">
+		<todo done="yes" collapse="no">
 			<title>remove</title>
-			<category>todo</category>
 			<text>
 </text>
 		</todo>
 		<todo done="no" collapse="no">
 			<title>edit</title>
-			<category>todo</category>
+			<category>in progress</category>
 			<text>
 </text>
 		</todo>

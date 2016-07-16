@@ -104,8 +104,25 @@ def add_handler(sub_args):
 
 
 def remove_handler(sub_args):
-    # TODO
-    pass
+    credential = Account.select().where(Account.alias == sub_args.alias)
+    if len(credential) == 0:
+        sys.exit("There is no credential with alias " + sub_args.alias)
+    else:
+        if sub_args.force:
+            _delete_alias(sub_args.alias)
+        else:
+            account = str(credential[0].account)
+            service = str(credential[0].service)
+            print "The credential for the account " + account + " of the service " + service + " will be removed."
+            if click.confirm("Confirm credential removal:"):
+                _delete_alias(sub_args.alias)
+            else:
+                sys.exit("Removal aborted")
+
+
+def _delete_alias(alias):
+    query = Account.delete().where(Account.alias == alias)
+    query.execute()
 
 
 def edit_handler(sub_args):
@@ -134,7 +151,7 @@ if __name__ == "__main__":
 
     # get sub command parser
     parser_get = subparsers.add_parser("get", help="Get a stored credential")
-    parser_get.add_argument("alias",
+    parser_get.add_argument("alias", nargs=1,
                             help="the alias of the account you want to gain credential of")
     parser_get.add_argument("-s", "--selection",
                             help="select which part of the credential you want. Account, passphrase or service",
@@ -164,7 +181,12 @@ if __name__ == "__main__":
 
     # remove sub command parser
     parser_remove = subparsers.add_parser("remove", help="Remove a credential")
-    # parser_remove.add_argument()
+    parser_remove.add_argument("alias", nargs=1,
+                               help="The alias of the account you want to delete")
+    parser_remove.add_argument("-f", "--force",
+                               help="Will delete the credential without asking",
+                               action="store_true",
+                               default=False)
     parser_remove.set_default(func=remove_handler)
 
     # edit sub command parser
