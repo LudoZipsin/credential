@@ -35,6 +35,11 @@
 				<text>
 </text>
 			</todo>
+			<todo done="no" collapse="no">
+				<title>click</title>
+				<text>
+</text>
+			</todo>
 		</todo>
 		<todo done="no" collapse="no">
 			<title>apt</title>

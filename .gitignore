@@ -16,3 +16,7 @@ src/main.py
 
 .idea/*
 
+# tudu -f notes
+
+.notes_lock
+

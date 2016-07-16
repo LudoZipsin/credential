@@ -3,6 +3,8 @@ import errno
 import argparse
 import getpass
 from account import Account
+from urlparse import urlparse
+import click
 
 
 def list_handler(sub_args):
@@ -71,8 +73,34 @@ def get_handler(sub_args):
 
 
 def add_handler(sub_args):
-    # TODO
-    pass
+    alias = sub_args.alias
+    service = sub_args.service
+    account = sub_args.account
+    if alias is None:
+        alias = str(click.prompt("Please type an alias to store the credential (this alias must be unique):"))
+        if not _alias_valid(alias):
+            select = Account.select().where(Account.alias == alias)
+            service = str(select[0].service)
+            account = str(select[0].account)
+            sys.exit("Aborting , this alias already exist for the service " + service + " and the account " + account)
+    if service is None:
+        service = str(click.prompt("Please type the name of the service you want to use"))
+        if not sub_args.noformat:
+            if service.split("://")[0].lower() == "http":
+                service = urlparse(service).netloc
+            service = service.lower()
+    if account is None:
+        account = str(click.prompt("Please enter the account for the credential (aka login)"))
+        select = Account.select().where(Account.service == service and Account.account == account)
+        if len(select) == 0:
+            print "The account " + account + " associated to the service " + service + " already exist"
+            if not click.confirm("Do you wish to continue adding this credential ?"):
+                sys.exit("Aborting")
+    passphrase = getpass.getpass("Enter passphrase:")
+    Account.create(service=service,
+                   account=account,
+                   passphrase=passphrase,
+                   alias=alias)
 
 
 def remove_handler(sub_args):
@@ -85,7 +113,7 @@ def edit_handler(sub_args):
     pass
 
 
-def _alias_validity(alias):
+def _alias_valid(alias):
     select = Account.select().where(Account.alias == alias)
     return True if len(select) == 0 else False
 
@@ -122,11 +150,16 @@ if __name__ == "__main__":
     # add sub command parser
     parser_add = subparsers.add_parser("add", help="Add a credential")
     parser_add.add_argument("-s", "--service",
-                            help="")
+                            help="specify the service you want to register")
     parser_add.add_argument("-a", "--account",
-                            help="")
+                            help="specify the account you want to register")
     parser_add.add_argument("-A", "--alias",
-                            help="")
+                            help="specify the alias to give to this credential")
+    parser_add.add_argument("-n", "--noformat",
+                            help="do not perform format on service (default to lower case and domain name)",
+                            action="store_true",
+                            default=False
+                            )
     parser_add.set_default(func=add_handler)
 
     # remove sub command parser

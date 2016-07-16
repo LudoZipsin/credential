@@ -3,3 +3,4 @@ peewee
 pyaml
 pyperclip
 PrettyTable
+click
