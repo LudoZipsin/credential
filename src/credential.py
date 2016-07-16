@@ -126,8 +126,29 @@ def _delete_alias(alias):
 
 
 def edit_handler(sub_args):
-    # TODO
+    if not sub_args.account and not sub_args.passphrase:
+        if click.confirm("Edit account ?"):
+            _edit_account(sub_args.alias)
+        if click.confirm("Edit passphrase ?"):
+            _edit_passphrase(sub_args.alias)
+    else:
+        if sub_args.account:
+            _edit_account(sub_args.alias)
+        if sub_args.passphrase:
+            _edit_passphrase(sub_args.alias)
     pass
+
+
+def _edit_account(alias):
+    account = str(click.prompt("Enter the new account:"))
+    query = Account.update(account=account).where(Account.alias == alias)
+    query.execute()
+
+
+def _edit_passphrase(alias):
+    passphrase = getpass.getpass("Enter the new passphrase:")
+    query = Account.update(passphrase=passphrase).where(Account.alias == alias)
+    query.execute()
 
 
 def _alias_valid(alias):
@@ -191,7 +212,16 @@ if __name__ == "__main__":
 
     # edit sub command parser
     parser_edit = subparsers.add_parser("edit", help="Edit a credential")
-    # parser_edit.add_argument()
+    parser_edit.add_argument("alias", nargs=1,
+                             help="The alias of the account you want to edit")
+    parser_edit.add_argument("-a", "--account",
+                             help="To change the account",
+                             action="store_true",
+                             default=False)
+    parser_edit.add_argument("-p", "--passphrase",
+                             help="To change the passphrase",
+                             action="store_true",
+                             default=False)
     parser_edit.set_default(func=edit_handler)
 
     args = parser.parse_args()

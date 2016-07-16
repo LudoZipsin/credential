@@ -81,11 +81,15 @@
 			<text>
 </text>
 		</todo>
-		<todo done="no" collapse="no">
+		<todo done="yes" collapse="no">
 			<title>edit</title>
-			<category>in progress</category>
 			<text>
 </text>
 		</todo>
+	</todo>
+	<todo done="no" collapse="no">
+		<title>Test</title>
+		<text>
+</text>
 	</todo>
 </todo>
