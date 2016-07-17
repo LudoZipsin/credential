@@ -1,10 +1,19 @@
-import sys
-import errno
+#! /usr/bin/env python
+
 import argparse
-import getpass
-from account import Account
-from urlparse import urlparse
 import click
+import errno
+import getpass
+import sys
+
+from urlparse import urlparse
+from peewee import DatabaseError
+
+try:
+    from account import Account
+except IOError:
+    print >> sys.stderr, "You need root permissions to do use credential."
+    sys.exit(1)
 
 
 def list_handler(sub_args):
@@ -22,8 +31,8 @@ def list_handler(sub_args):
         # list only the account of the given service if the service is used
         account_dict = {}
         for i in Account.select().where(Account.service == sub_args.service):
-            account_dict[i.account] = i.alias
-        _list_account_printer(account_dict, ["account name", "alias"])
+            account_dict[i.alias] = i.account
+        _list_account_printer(account_dict, ["alias", "account name"])
 
 
 def _pretty_table_availability():
@@ -62,8 +71,13 @@ def _list_account_printer(dictionary, field_list):
 
 def get_handler(sub_args):
     credential = Account.select().where(Account.alias == sub_args.alias)
-    get = credential.account if sub_args.selection == "account" \
-        else credential.passphrase if sub_args.selection == "passphrase" \
+    alias = sub_args.alias[0]
+    if len(credential) == 0:
+        sys.exit("There is no credential for the alias " + alias)
+    credential = credential[0]
+    selection = sub_args.selection[0]
+    get = credential.account if selection == "account" \
+        else credential.passphrase if selection == "passphrase" \
         else credential.service
     if sub_args.prompt:
         print get
@@ -77,25 +91,25 @@ def add_handler(sub_args):
     service = sub_args.service
     account = sub_args.account
     if alias is None:
-        alias = str(click.prompt("Please type an alias to store the credential (this alias must be unique):"))
-        if not _alias_valid(alias):
-            select = Account.select().where(Account.alias == alias)
-            service = str(select[0].service)
-            account = str(select[0].account)
-            sys.exit("Aborting , this alias already exist for the service " + service + " and the account " + account)
+        alias = str(click.prompt("Please type an alias to store the credential (this alias must be unique)"))
+    if not _alias_valid(alias):
+        select = Account.select().where(Account.alias == alias)
+        service = str(select[0].service)
+        account = str(select[0].account)
+        sys.exit("Aborting , this alias already exist for the service " + service + " and the account " + account)
     if service is None:
         service = str(click.prompt("Please type the name of the service you want to use"))
-        if not sub_args.noformat:
-            if service.split("://")[0].lower() == "http":
-                service = urlparse(service).netloc
-            service = service.lower()
+    if not sub_args.noformat:
+        if service.split("://")[0].lower() == "http":
+            service = urlparse(service).netloc
+        service = service.lower()
     if account is None:
         account = str(click.prompt("Please enter the account for the credential (aka login)"))
-        select = Account.select().where(Account.service == service and Account.account == account)
-        if len(select) == 0:
-            print "The account " + account + " associated to the service " + service + " already exist"
-            if not click.confirm("Do you wish to continue adding this credential ?"):
-                sys.exit("Aborting")
+    select = Account.select().where((Account.service == service) & (Account.account == account))
+    if len(select) != 0:
+        print "The account " + account + " associated to the service " + service + " already exist"
+        if not click.confirm("Do you wish to continue adding this credential ?"):
+            sys.exit("Aborting")
     passphrase = getpass.getpass("Enter passphrase:")
     Account.create(service=service,
                    account=account,
@@ -104,18 +118,19 @@ def add_handler(sub_args):
 
 
 def remove_handler(sub_args):
-    credential = Account.select().where(Account.alias == sub_args.alias)
+    alias = sub_args.alias[0]
+    credential = Account.select().where(Account.alias == alias)
     if len(credential) == 0:
-        sys.exit("There is no credential with alias " + sub_args.alias)
+        sys.exit("There is no credential with alias " + alias)
     else:
         if sub_args.force:
-            _delete_alias(sub_args.alias)
+            _delete_alias(alias)
         else:
             account = str(credential[0].account)
             service = str(credential[0].service)
             print "The credential for the account " + account + " of the service " + service + " will be removed."
             if click.confirm("Confirm credential removal:"):
-                _delete_alias(sub_args.alias)
+                _delete_alias(alias)
             else:
                 sys.exit("Removal aborted")
 
@@ -140,7 +155,7 @@ def edit_handler(sub_args):
 
 
 def _edit_account(alias):
-    account = str(click.prompt("Enter the new account:"))
+    account = str(click.prompt("Enter the new account"))
     query = Account.update(account=account).where(Account.alias == alias)
     query.execute()
 
@@ -168,7 +183,7 @@ if __name__ == "__main__":
                              help="List account stored for the given service",
                              type=str,
                              nargs=1)
-    parser_list.set_default(func=list_handler)
+    parser_list.set_defaults(func=list_handler)
 
     # get sub command parser
     parser_get = subparsers.add_parser("get", help="Get a stored credential")
@@ -180,10 +195,10 @@ if __name__ == "__main__":
                             default="service",
                             nargs=1)
     parser_get.add_argument("-p", "--prompt",
-                            help="Do not store the credential in the clipboard but pormpt it",
+                            help="Do not store the credential in the clipboard but prompt it",
                             action="store_true",
                             default=False)
-    parser_get.set_default(func=get_handler)
+    parser_get.set_defaults(func=get_handler)
 
     # add sub command parser
     parser_add = subparsers.add_parser("add", help="Add a credential")
@@ -198,7 +213,7 @@ if __name__ == "__main__":
                             action="store_true",
                             default=False
                             )
-    parser_add.set_default(func=add_handler)
+    parser_add.set_defaults(func=add_handler)
 
     # remove sub command parser
     parser_remove = subparsers.add_parser("remove", help="Remove a credential")
@@ -208,7 +223,7 @@ if __name__ == "__main__":
                                help="Will delete the credential without asking",
                                action="store_true",
                                default=False)
-    parser_remove.set_default(func=remove_handler)
+    parser_remove.set_defaults(func=remove_handler)
 
     # edit sub command parser
     parser_edit = subparsers.add_parser("edit", help="Edit a credential")
@@ -222,13 +237,17 @@ if __name__ == "__main__":
                              help="To change the passphrase",
                              action="store_true",
                              default=False)
-    parser_edit.set_default(func=edit_handler)
+    parser_edit.set_defaults(func=edit_handler)
 
     args = parser.parse_args()
 
     try:
+        Account.create_table(fail_silently=True)
         args.func(args)
     except IOError as e:
         if e[0] == errno.EPERM:
             print >> sys.stderr, "You need root permissions to do use credential."
             sys.exit(1)
+    except DatabaseError:
+        print >> sys.stderr, "Wrong passphrase for the database. Check your config.yml file and fix your passphrase."
+        sys.exit(1)

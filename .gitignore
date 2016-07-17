@@ -20,3 +20,6 @@ src/main.py
 
 .notes_lock
 
+# python
+
+*.pyc
