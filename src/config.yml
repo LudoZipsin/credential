@@ -1,0 +1,3 @@
+db_path: /etc/credential/credential.db
+db_passphrase: passphrase
+
